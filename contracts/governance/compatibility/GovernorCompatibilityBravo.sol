@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts v4.4.0 (governance/compatibility/GovernorCompatibilityBravo.sol)
+// OpenZeppelin Contracts (last updated v4.6.0) (governance/compatibility/GovernorCompatibilityBravo.sol)
 
 pragma solidity ^0.8.0;
 
-import "../../utils/Counters.sol";
 import "../../utils/math/SafeCast.sol";
 import "../extensions/IGovernorTimelock.sol";
 import "../Governor.sol";
@@ -13,16 +12,13 @@ import "./IGovernorCompatibilityBravo.sol";
  * @dev Compatibility layer that implements GovernorBravo compatibility on to of {Governor}.
  *
  * This compatibility layer includes a voting system and requires a {IGovernorTimelock} compatible module to be added
- * through inheritance. It does not include token bindings, not does it include any variable upgrade patterns.
+ * through inheritance. It does not include token bindings, nor does it include any variable upgrade patterns.
  *
  * NOTE: When using this module, you may need to enable the Solidity optimizer to avoid hitting the contract size limit.
  *
  * _Available since v4.3._
  */
 abstract contract GovernorCompatibilityBravo is IGovernorTimelock, IGovernorCompatibilityBravo, Governor {
-    using Counters for Counters.Counter;
-    using Timers for Timers.BlockNumber;
-
     enum VoteType {
         Against,
         For,
@@ -132,7 +128,7 @@ abstract contract GovernorCompatibilityBravo is IGovernorTimelock, IGovernorComp
         for (uint256 i = 0; i < signatures.length; ++i) {
             fullcalldatas[i] = bytes(signatures[i]).length == 0
                 ? calldatas[i]
-                : abi.encodeWithSignature(signatures[i], calldatas[i]);
+                : abi.encodePacked(bytes4(keccak256(bytes(signatures[i]))), calldatas[i]);
         }
 
         return fullcalldatas;
@@ -265,7 +261,8 @@ abstract contract GovernorCompatibilityBravo is IGovernorTimelock, IGovernorComp
         uint256 proposalId,
         address account,
         uint8 support,
-        uint256 weight
+        uint256 weight,
+        bytes memory // params
     ) internal virtual override {
         ProposalDetails storage details = _proposalDetails[proposalId];
         Receipt storage receipt = details.receipts[account];

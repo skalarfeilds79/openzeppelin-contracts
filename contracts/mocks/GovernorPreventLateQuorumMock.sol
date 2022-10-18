@@ -17,7 +17,7 @@ contract GovernorPreventLateQuorumMock is
 
     constructor(
         string memory name_,
-        ERC20Votes token_,
+        IVotes token_,
         uint256 votingDelay_,
         uint256 votingPeriod_,
         uint256 quorum_,
@@ -31,21 +31,20 @@ contract GovernorPreventLateQuorumMock is
         _quorum = quorum_;
     }
 
-    function quorum(uint256) public view virtual override returns (uint256) {
+    function quorum(uint256) public view override returns (uint256) {
         return _quorum;
     }
 
     function proposalDeadline(uint256 proposalId)
         public
         view
-        virtual
         override(Governor, GovernorPreventLateQuorum)
         returns (uint256)
     {
         return super.proposalDeadline(proposalId);
     }
 
-    function proposalThreshold() public view virtual override(Governor, GovernorSettings) returns (uint256) {
+    function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.proposalThreshold();
     }
 
@@ -53,8 +52,9 @@ contract GovernorPreventLateQuorumMock is
         uint256 proposalId,
         address account,
         uint8 support,
-        string memory reason
-    ) internal virtual override(Governor, GovernorPreventLateQuorum) returns (uint256) {
-        return super._castVote(proposalId, account, support, reason);
+        string memory reason,
+        bytes memory params
+    ) internal override(Governor, GovernorPreventLateQuorum) returns (uint256) {
+        return super._castVote(proposalId, account, support, reason, params);
     }
 }
